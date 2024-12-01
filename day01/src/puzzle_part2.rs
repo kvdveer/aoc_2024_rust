@@ -6,14 +6,14 @@ pub fn solve(input: &PuzzleInput) -> String {
     // Build a counter hashmap for the second element of each pair
     let mut b = HashMap::new();
     input.pairs.iter().map(|pair| pair.1).for_each(|num| {
-        let count = b.entry(num).or_insert(0u64);
+        let count = b.entry(num).or_insert(0i32);
         *count += 1;
     });
 
     // Multiply the first element of each pair by the count in the second list
     let a = input.pairs.iter().map(|pair| pair.0);
     a.map(|a_num| b.get(&a_num).unwrap_or(&0) * a_num)
-        .sum::<u64>()
+        .sum::<i32>()
         .to_string()
 }
 

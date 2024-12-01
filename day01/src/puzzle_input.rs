@@ -1,6 +1,6 @@
 use nom::{
     self,
-    character::complete::{line_ending, multispace0, newline, not_line_ending, space1, u64},
+    character::complete::{line_ending, multispace0, newline, not_line_ending, space1, i32},
     combinator::{map, peek},
     error::Error,
     multi::separated_list1,
@@ -13,13 +13,13 @@ pub struct PuzzleInput<'puzzle> {
     // The raw, unparsed lines of the input. Added here for convenience, in case parsing loses some information.
     pub raw_lines: Vec<&'puzzle str>,
 
-    pub pairs: Vec<(u64, u64)>,
+    pub pairs: Vec<(i32, i32)>,
 }
 
 fn parse_puzzle(input: &str) -> IResult<&str, PuzzleInput> {
     let puzzle_input = separated_list1(
         newline,
-        separated_pair(u64, space1, u64),
+        separated_pair(i32, space1, i32),
     );
 
     // strip whitespace around the input (copy-pasting can me inprecise with respect to whitespace)

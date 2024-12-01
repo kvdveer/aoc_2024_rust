@@ -2,20 +2,20 @@ use crate::puzzle_input::PuzzleInput;
 
 pub fn solve(input: &PuzzleInput) -> String {
     // Split the pairs into two separate vectors
-    let (mut a, mut b): (Vec<u64>, Vec<u64>) = input.pairs.iter().cloned().unzip();
+    let (mut a, mut b): (Vec<i32>, Vec<i32>) = input.pairs.iter().cloned().unzip();
 
     // Sort each vector
     a.sort();
     b.sort();
 
-    let differences: u64 = a
+    let differences: i32 = a
         // Re-pair
         .iter()
         .zip(b.iter())
         // Calculate the difference between each pair
-        .map(|(a, b)| if a > b { a - b } else { b - a })
+        .map(|(a, b)| a.abs_diff(*b) as i32)
         // Sum the differences
-        .sum();
+        .sum::<i32>();
 
     differences.to_string()
 }
