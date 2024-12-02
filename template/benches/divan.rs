@@ -12,7 +12,7 @@ fn parsing() {
 }
 
 #[divan::bench]
-fn parsing_test() {
+fn parsing_example() {
     let puzzle_input = include_str!("../example_input.txt");
     puzzle_input::PuzzleInput::try_from(divan::black_box(puzzle_input)).unwrap();
 }
@@ -33,14 +33,14 @@ fn part2(bencher: Bencher) {
 }
 
 #[divan::bench]
-fn part1test(bencher: Bencher) {
+fn part1example(bencher: Bencher) {
     let puzzle_input = include_str!("../example_input.txt");
     let parsed = puzzle_input::PuzzleInput::try_from(divan::black_box(puzzle_input)).unwrap();
     bencher.bench_local(|| puzzle_part1::solve(divan::black_box(&parsed)));
 }
 
 #[divan::bench]
-fn part2test(bencher: Bencher) {
+fn part2example(bencher: Bencher) {
     let puzzle_input = include_str!("../example_input.txt");
     let parsed = puzzle_input::PuzzleInput::try_from(divan::black_box(puzzle_input)).unwrap();
 

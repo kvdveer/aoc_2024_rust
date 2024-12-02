@@ -6,7 +6,7 @@ use criterion::{criterion_group, criterion_main};
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     let inputs = [
-        ("test", include_str!("../example_input.txt")),
+        ("example", include_str!("../example_input.txt")),
         ("puzzle", include_str!("../input.txt")),
     ];
     let mut group = c.benchmark_group("{{project-name}}");
