@@ -1,11 +1,10 @@
 use nom::{
     self,
-    bytes::complete::tag,
     character::complete::{line_ending, multispace0, not_line_ending},
-    combinator::{map, peek},
+    combinator::map,
     error::Error,
     multi::separated_list1,
-    sequence::{delimited, tuple},
+    sequence::delimited,
     Finish, IResult,
 };
 
@@ -16,21 +15,14 @@ pub struct PuzzleInput<'puzzle> {
 }
 
 fn parse_puzzle(input: &str) -> IResult<&str, PuzzleInput> {
-    let puzzle_input = tag("todo");
+    // Main parser for the puzzle
+    let puzzle_parser = map(
+        separated_list1(line_ending, not_line_ending),
+        |raw_lines| PuzzleInput { raw_lines },
+    );
 
     // strip whitespace around the input (copy-pasting can me inprecise with respect to whitespace)
-    let mut parser = delimited(
-        multispace0,
-        map(
-            // Use peek to parse two ways (just the lines, then the actual parsed input)
-            tuple((
-                peek(separated_list1(line_ending, not_line_ending)),
-                puzzle_input,
-            )),
-            |(raw_lines, _)| PuzzleInput { raw_lines },
-        ),
-        multispace0,
-    );
+    let mut parser = delimited(multispace0, puzzle_parser, multispace0);
 
     parser(input)
 }

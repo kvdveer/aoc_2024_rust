@@ -1,4 +1,3 @@
-
 use nom::{
     character::complete::{alpha1, line_ending, multispace0},
     combinator::map,
@@ -9,9 +8,8 @@ use nom::{
 };
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct PuzzleInput<'puzzle> {
+pub struct PuzzleInput {
     // The raw, unparsed lines of the input. Added here for convenience, in case parsing loses some information.
-    pub raw_lines: Vec<&'puzzle str>,
     pub letters: aoc_grid::Grid<char>,
 }
 
@@ -20,14 +18,13 @@ fn parse_puzzle(input: &str) -> IResult<&str, PuzzleInput> {
     let mut parser = delimited(
         multispace0,
         map(
-            separated_list1(line_ending::<&str,_>, alpha1),
+            separated_list1(line_ending::<&str, _>, alpha1),
             |raw_lines| PuzzleInput {
                 letters: aoc_grid::Grid::new_from_iter(
                     raw_lines.len(),
                     raw_lines[0].len(),
                     raw_lines.iter().flat_map(|line| line.chars()),
                 ),
-                raw_lines,
             },
         ),
         multispace0,
@@ -36,13 +33,16 @@ fn parse_puzzle(input: &str) -> IResult<&str, PuzzleInput> {
     parser(input)
 }
 
-impl<'puzzle> TryFrom<&'puzzle str> for PuzzleInput<'puzzle> {
-    type Error = Error<&'puzzle str>;
+impl TryFrom<&str> for PuzzleInput {
+    type Error = Error<String>;
 
-    fn try_from(s: &'puzzle str) -> Result<Self, Self::Error> {
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
         match parse_puzzle(s).finish() {
             Ok((_remaining, puzzle_input)) => Ok(puzzle_input),
-            Err(Error { input, code }) => Err(Error { input, code }),
+            Err(Error { input, code }) => Err(Error {
+                input: input.to_string(),
+                code,
+            }),
         }
     }
 }
@@ -62,7 +62,6 @@ mod tests {
     /// Verifies that the test input is valid.
     fn test_puzzle_input_from_example_input(#[case] input: &str) {
         let input = PuzzleInput::try_from(input).unwrap();
-        assert!(!input.raw_lines.is_empty());
         assert!(input.letters.width() > 1);
     }
 }

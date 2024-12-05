@@ -1,18 +1,14 @@
 use nom::{
-    self,
-    character::complete::{line_ending, multispace0, not_line_ending, space1, i8},
-    combinator::{map, peek},
+    character::complete::{i8, line_ending, multispace0, space1},
+    combinator::map,
     error::Error,
     multi::separated_list1,
-    sequence::{delimited, tuple},
+    sequence::delimited,
     Finish, IResult,
 };
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct PuzzleInput<'puzzle> {
-    // The raw, unparsed lines of the input. Added here for convenience, in case parsing loses some information.
-    pub raw_lines: Vec<&'puzzle str>,
-    
+pub struct PuzzleInput {
     pub reports: Vec<Vec<i8>>,
 }
 
@@ -22,27 +18,23 @@ fn parse_puzzle(input: &str) -> IResult<&str, PuzzleInput> {
     // strip whitespace around the input (copy-pasting can me inprecise with respect to whitespace)
     let mut parser = delimited(
         multispace0,
-        map(
-            // Use peek to parse two ways (just the lines, then the actual parsed input)
-            tuple((
-                peek(separated_list1(line_ending, not_line_ending)),
-                puzzle_input,
-            )),
-            |(raw_lines, reports)| PuzzleInput { raw_lines, reports },
-        ),
+        map(puzzle_input, |reports| PuzzleInput { reports }),
         multispace0,
     );
 
     parser(input)
 }
 
-impl<'puzzle> TryFrom<&'puzzle str> for PuzzleInput<'puzzle> {
-    type Error = Error<&'puzzle str>;
+impl TryFrom<&str> for PuzzleInput {
+    type Error = Error<String>;
 
-    fn try_from(s: &'puzzle str) -> Result<Self, Self::Error> {
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
         match parse_puzzle(s).finish() {
             Ok((_remaining, puzzle_input)) => Ok(puzzle_input),
-            Err(Error { input, code }) => Err(Error { input, code }),
+            Err(Error { input, code }) => Err(Error {
+                input: input.to_string(),
+                code,
+            }),
         }
     }
 }
@@ -62,7 +54,7 @@ mod tests {
     /// Verifies that the test input is valid.
     fn test_puzzle_input_from_example_input(#[case] input: &str) {
         let input = PuzzleInput::try_from(input).unwrap();
-        assert!(!input.raw_lines.is_empty());
+        assert!(!input.reports.is_empty());
     }
 
     #[rstest]
