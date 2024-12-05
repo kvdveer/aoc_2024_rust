@@ -42,6 +42,15 @@ time:   [2.2857 ms 2.3266 ms 2.3691 ms]
 change: [-81.639% -81.118% -80.626%] (p = 0.00 < 0.05)
 ```
 
+### Optimization: only sort half the sequence
+
+As the question calls for the middle page, we don't need to sort beyond that. Sorting the first half is the hardest part, as it has the most rules. The second half is easier, as it has fewer rules, but even then, this gave me ~8% performance improvement. (on top of some memory mangement fixes)
+
+```txt
+time:   [1.9809 ms 1.9985 ms 2.0185 ms]                                
+change: [-2.1402% -0.7235% +0.6787%] (p = 0.32 > 0.05)
+```
+
 ## Performance
 
 | part | best | average | worst |

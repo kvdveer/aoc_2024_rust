@@ -20,7 +20,7 @@ fn order_sequence(rules: &[(u8, u8)], sequence: &[u8]) -> Vec<u8> {
 
     let mut result = Vec::with_capacity(sequence.len());
 
-    while !relevant_rules.is_empty() {
+    while result.len() * 2 <= sequence.len() {
         // Find a token that is _not_ placed after any other token.
         let (idx, &token) = tokens
             .iter()
@@ -33,7 +33,7 @@ fn order_sequence(rules: &[(u8, u8)], sequence: &[u8]) -> Vec<u8> {
         relevant_rules.retain(|(l, r)| *l != token && *r != token);
     }
 
-    result.extend(0u8..(sequence.len() - result.len()) as u8);
+    result.extend(tokens);
     result
 }
 
