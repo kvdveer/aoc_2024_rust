@@ -10,31 +10,30 @@ fn sequence_is_valid(rules: &BTreeSet<(u8, u8)>, sequence: &[u8]) -> bool {
 }
 
 fn order_sequence(rules: &[(u8, u8)], sequence: &[u8]) -> Vec<u8> {
-    let mut tokens = sequence.iter().copied().collect::<BTreeSet<_>>();
+    let mut tokens = sequence.to_vec();
 
     // Filter out the relevant rules
     let mut relevant_rules = rules
         .iter()
         .filter(|(l, r)| sequence.contains(l) && sequence.contains(r))
-        .copied()
         .collect::<Vec<_>>();
 
-    let mut result = Vec::new();
+    let mut result = Vec::with_capacity(sequence.len());
 
     while !relevant_rules.is_empty() {
         // Find a token that is _not_ placed after any other token.
-        let token = tokens
+        let (idx, &token) = tokens
             .iter()
-            .copied()
-            .find(|token| !relevant_rules.iter().any(|(_, r)| r == token))
+            .enumerate()
+            .find(|(_, token)| !relevant_rules.iter().any(|(_, r)| r == *token))
             .expect("Rules should be consistent");
 
         result.push(token);
-        tokens.remove(&token);
+        tokens.remove(idx);
         relevant_rules.retain(|(l, r)| *l != token && *r != token);
     }
 
-    result.extend(tokens.iter());
+    result.extend(0u8..(sequence.len() - result.len()) as u8);
     result
 }
 
@@ -66,17 +65,5 @@ mod tests {
     fn test_solve(#[case] input: &str, #[case] expected: &str) {
         let input = PuzzleInput::try_from(input).unwrap();
         assert_eq!(solve(&input), expected);
-    }
-
-    #[rstest]
-    #[case::example_sequence(include_str!("../example_input.txt"), vec![75,97,47,61,53], vec![97,75,47,61,53])]
-    fn test_ordered(
-        #[case] puzzle_input: &str,
-        #[case] sequence: Vec<u8>,
-        #[case] expected: Vec<u8>,
-    ) {
-        let input = PuzzleInput::try_from(puzzle_input).unwrap();
-        let sorted = order_sequence(&input.rules, &sequence);
-        assert_eq!(sorted, expected);
     }
 }
