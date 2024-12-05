@@ -10,40 +10,31 @@ fn sequence_is_valid(rules: &BTreeSet<(u8, u8)>, sequence: &[u8]) -> bool {
 }
 
 fn order_sequence(rules: &[(u8, u8)], sequence: &[u8]) -> Vec<u8> {
+    let mut tokens = sequence.iter().copied().collect::<BTreeSet<_>>();
+
     // Filter out the relevant rules
     let mut relevant_rules = rules
         .iter()
         .filter(|(l, r)| sequence.contains(l) && sequence.contains(r))
         .copied()
-        .collect::<BTreeSet<_>>();
+        .collect::<Vec<_>>();
 
-    // Exend the rules with implied rules (e.g. A|B and B|C implies A|C)
-    loop {
-        let rules_at_start = relevant_rules.len();
-        let implied_rules = relevant_rules
+    let mut result = Vec::new();
+
+    while !relevant_rules.is_empty() {
+        // Find a token that is _not_ placed after any other token.
+        let token = tokens
             .iter()
-            .flat_map(|(left, middle)| {
-                relevant_rules.iter().filter_map(|(middle2, right)| {
-                    if *middle2 == *middle {
-                        Some((*left, *right))
-                    } else {
-                        None
-                    }
-                })
-            })
-            .collect::<Vec<_>>();
+            .copied()
+            .find(|token| !relevant_rules.iter().any(|(_, r)| r == token))
+            .expect("Rules should be consistent");
 
-        relevant_rules.extend(implied_rules.iter());
-
-        // When there's no more rules added, all implied rules are found
-        if relevant_rules.len() == rules_at_start {
-            break;
-        }
-        dbg!(relevant_rules.len());
+        result.push(token);
+        tokens.remove(&token);
+        relevant_rules.retain(|(l, r)| *l != token && *r != token);
     }
 
-    let mut result = sequence.to_vec();
-    result.sort_by_cached_key(|token| relevant_rules.iter().filter(|(_, r)| r == token).count());
+    result.extend(tokens.iter());
     result
 }
 
@@ -71,7 +62,6 @@ mod tests {
     #[rstest]
     // #[ignore]
     #[case::example_input(include_str!("../example_input.txt"), "123")]
-    #[ignore]
     #[case::final_input( include_str!("../input.txt"), "4922")]
     fn test_solve(#[case] input: &str, #[case] expected: &str) {
         let input = PuzzleInput::try_from(input).unwrap();

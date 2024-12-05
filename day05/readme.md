@@ -16,13 +16,31 @@ My implementation is now O(log(N)*M^2), where N is the number of rules, M is the
 
 I was again tempted into premature optimization, but this time I managed to stop earlier. I just re-used the code from part 1 to check if a sequence is valid.
 
-For the invalid sequences do the following:
+My first implemementation did the following:
 
-* Filter out the relevant rules O(N *M)
-* Expand implied rules O(M^2)
-* Sort the token according to the implied rules O(N*log(M))
+* Filter out the relevant rules `O(N *M)`
+* Expand implied rules `O(M^3)`  _e.g. a|b and b|c implies a|c_
+* Sort the token according to the implied rules `O(N*log(M))`
 
-The rule expansion is the most expensive part.
+### Optimzation: different algorithm
+
+After some thinking, I figured out a faster way:
+
+* Filter out the relevant rules `O(N * M)`
+* Until we have processed all tokens `O(M)`:
+  * Find a page number that, is never after some other token `O(N)`,
+  * That page number is the next token after sorting
+  * Remove that token from the list `O(M)`
+  * Remove rules that reference the token
+
+I believe this algorithm is `O(N*M)`.
+
+Criterion confirmed this is substantially faster:
+
+```txt
+time:   [2.2857 ms 2.3266 ms 2.3691 ms]                                   
+change: [-81.639% -81.118% -80.626%] (p = 0.00 < 0.05)
+```
 
 ## Performance
 
@@ -30,5 +48,5 @@ The rule expansion is the most expensive part.
 |---|---|---|---|
 |parse | 46.034 µs | 46.347 µs | 46.700 µs |
 |part1 | 406.05 µs | 407.95 µs | 409.88 µs |
-|part2 | 11.503 ms | 11.563 ms | 11.623 ms |
-|complete | 12.404 ms | 12.557 ms | 12.724 ms |
+|part2 | 1.7801 ms | 1.7940 ms | 1.8080 ms  |
+|complete |  2.2705 ms | 2.2798 ms | 2.2895 m|
