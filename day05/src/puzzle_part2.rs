@@ -29,7 +29,7 @@ fn order_sequence(rules: &[(u8, u8)], sequence: &[u8]) -> Vec<u8> {
             .expect("Rules should be consistent");
 
         result.push(token);
-        tokens.remove(idx);
+        tokens.swap_remove(idx);
         relevant_rules.retain(|(l, r)| *l != token && *r != token);
     }
 
