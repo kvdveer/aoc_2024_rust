@@ -22,6 +22,13 @@ pub fn criterion_benchmark(c: &mut Criterion) {
             group.bench_with_input(BenchmarkId::new("part2", name), &parsed, |b, parsed| {
                 b.iter(|| puzzle_part2::solve(parsed));
             });
+            group.bench_with_input(BenchmarkId::new("complete", name), input, |b, parsed| {
+                b.iter(|| {
+                    let parsed = puzzle_input::PuzzleInput::try_from(parsed).unwrap();
+                    puzzle_part1::solve(&parsed);
+                    puzzle_part2::solve(&parsed);
+                });
+            });
         }
     }
 }
