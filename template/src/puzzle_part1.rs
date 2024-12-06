@@ -1,9 +1,8 @@
 use crate::puzzle_input::PuzzleInput;
 
 pub fn solve(_input: &PuzzleInput) -> String {
-    todo!()
+    "UNSOLVED".to_string()
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -12,7 +11,6 @@ mod tests {
     use super::*;
 
     #[rstest]
-    #[ignore]
     #[case::example_input(include_str!("../example_input.txt"), "UNSOLVED")]
     #[ignore]
     #[case::final_input( include_str!("../input.txt"), "UNSOLVED")]

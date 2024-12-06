@@ -241,6 +241,6 @@ mod tests {
 
     #[test]
     fn test_math() {
-        assert_eq!(Direction::Up + &Coordinate(1,2), Coordinate(1,1));
+        assert_eq!(Direction::Up + &Coordinate(1, 2), Coordinate(1, 1));
     }
 }

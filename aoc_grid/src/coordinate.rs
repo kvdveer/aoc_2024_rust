@@ -1,5 +1,5 @@
 //! A simple 2D coordinate type.
-//! 
+//!
 //! This module provides a simple 2D coordinate type that can be used to represent points on a
 //! grid. It is intended to be used in conjunction with the `Grid` type, which provides a 2D grid
 //! data structure.

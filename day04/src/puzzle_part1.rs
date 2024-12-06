@@ -20,7 +20,7 @@ pub fn solve(input: &PuzzleInput) -> String {
                         .iter()
                         .enumerate()
                         // reverse to make sure we're checking the furthest character first, it gives an early-out for out-of-bounds
-                        .rev()  
+                        .rev()
                         .all(|(idx, c)| input.letters.get((dir * idx) + coord) == Some(c))
                 })
                 .count()

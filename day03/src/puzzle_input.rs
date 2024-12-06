@@ -17,10 +17,9 @@ fn parse_puzzle(input: &str) -> IResult<&str, PuzzleInput> {
     // strip whitespace around the input (copy-pasting can be inprecise with respect to whitespace)
     let mut parser = delimited(
         multispace0,
-        map(
-            separated_list1(line_ending, not_line_ending),
-            |raw_lines| PuzzleInput { raw_lines },
-        ),
+        map(separated_list1(line_ending, not_line_ending), |raw_lines| {
+            PuzzleInput { raw_lines }
+        }),
         multispace0,
     );
 

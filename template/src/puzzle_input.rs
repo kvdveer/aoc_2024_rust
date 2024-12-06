@@ -16,10 +16,9 @@ pub struct PuzzleInput<'puzzle> {
 
 fn parse_puzzle(input: &str) -> IResult<&str, PuzzleInput> {
     // Main parser for the puzzle
-    let puzzle_parser = map(
-        separated_list1(line_ending, not_line_ending),
-        |raw_lines| PuzzleInput { raw_lines },
-    );
+    let puzzle_parser = map(separated_list1(line_ending, not_line_ending), |raw_lines| {
+        PuzzleInput { raw_lines }
+    });
 
     // strip whitespace around the input (copy-pasting can me inprecise with respect to whitespace)
     let mut parser = delimited(multispace0, puzzle_parser, multispace0);
@@ -27,13 +26,16 @@ fn parse_puzzle(input: &str) -> IResult<&str, PuzzleInput> {
     parser(input)
 }
 
-impl<'puzzle> TryFrom<&'puzzle str> for PuzzleInput<'puzzle> {
-    type Error = Error<&'puzzle str>;
+impl TryFrom<&str> for PuzzleInput {
+    type Error = Error<String>;
 
-    fn try_from(s: &'puzzle str) -> Result<Self, Self::Error> {
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
         match parse_puzzle(s).finish() {
             Ok((_remaining, puzzle_input)) => Ok(puzzle_input),
-            Err(Error { input, code }) => Err(Error { input, code }),
+            Err(Error { input, code }) => Err(Error {
+                input: input.to_string(),
+                code,
+            }),
         }
     }
 }
