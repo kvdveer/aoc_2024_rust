@@ -4,6 +4,7 @@
 use std::{
     fmt::{self},
     ops::{Index, IndexMut},
+    usize,
 };
 
 use crate::Coordinate;
@@ -46,27 +47,30 @@ impl<T> Grid<T> {
 
     // Height of the grid
     #[must_use]
-    pub fn height(&self) -> isize {
-        (self.cells.len() / self.stride) as isize
+    pub fn height(&self) -> usize {
+        self.cells.len() / self.stride
     }
 
     // Width of the grid
     #[must_use]
-    pub const fn width(&self) -> isize {
-        self.stride as isize
+    pub const fn width(&self) -> usize {
+        self.stride
     }
 
     // Wraps a coordinate to be inside the grid boundaries.
     #[must_use]
     pub fn wrap<U: Into<(isize, isize)>>(&self, pos: U) -> Coordinate {
+        let w = self.width() as isize;
+        let h = self.height() as isize;
+
         let pos: (isize, isize) = pos.into();
-        let mut x = pos.0 % self.width();
-        let mut y = pos.1 % self.height();
+        let mut x = pos.0 % w;
+        let mut y = pos.1 % h;
         if x < 0 {
-            x += self.width()
+            x += w;
         }
         if y < 0 {
-            y += self.height()
+            y += h
         }
         Coordinate::new(x, y)
     }
@@ -94,8 +98,8 @@ impl<T> Grid<T> {
     // Merges two grids together, cell by cell, with tuples per cell.
     pub fn zip<U, V>(&self, other: &Grid<U>, f: impl Fn((&T, &U)) -> V) -> Grid<V> {
         Grid::<V>::new_from_iter(
-            self.width() as usize,
-            self.height() as usize,
+            self.width(),
+            self.height(),
             self.iter().zip(other.iter()).map(|(a, b)| f((a, b))),
         )
     }
@@ -129,10 +133,21 @@ impl<T> Grid<T> {
             Coordinate(x as isize, y as isize)
         })
     }
+    // Iterates over the entries of the grid.
+    pub fn iter_pairs(&self) -> impl Iterator<Item = (Coordinate, &T)> + '_ {
+        self.cells.iter().enumerate().map(move |(i, _)| {
+            let x = i % self.stride;
+            let y = i / self.stride;
+            (Coordinate(x as isize, y as isize), &self.cells[i])
+        })
+    }
 
     pub fn coordinate_valid<U: Into<(isize, isize)>>(&self, pos: U) -> bool {
         let pos: (isize, isize) = pos.into();
-        pos.0 >= 0 && pos.0 < self.width() && pos.1 >= 0 && pos.1 < self.height()
+        pos.0 >= 0
+            && (pos.0 < self.width() as isize)
+            && pos.1 >= 0
+            && pos.1 < (self.height() as isize)
     }
 }
 
@@ -165,11 +180,11 @@ where
     // Returns a new grid with the same dimensions as self, with the rows and columns swapped.
     #[must_use]
     pub fn transpose(&self) -> Self {
-        let new_stride = self.height() as usize;
+        let new_stride = self.height();
         let mut cells = Vec::<T>::with_capacity(self.cells.len());
         for x in 0..self.width() {
             for y in 0..self.height() {
-                cells.push(self[(x, y)].clone());
+                cells.push(self.cells[y * self.stride + x].clone());
             }
         }
         Self {
@@ -219,7 +234,7 @@ where
         writeln!(f)?;
         for y in 0..self.height() {
             for x in 0..self.width() {
-                let cell = &self.cells[self.offset((x, y))];
+                let cell = &self.cells[self.offset((x as isize, y as isize))];
                 let c: char = char::from(*cell);
                 write!(f, "{c}")?;
             }

@@ -25,7 +25,7 @@ impl MapState {
                 _ => c,
             }),
             // Mark no position as visited yet
-            visited: Grid::new(base_map.width() as usize, base_map.height() as usize),
+            visited: Grid::new(base_map.width(), base_map.height()),
 
             // Look up the guard position
             guard_position: base_map

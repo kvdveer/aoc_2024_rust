@@ -35,7 +35,7 @@ impl Guard {
 }
 
 fn does_loop(map: &Grid<MapElement>, mut guard: Guard, extra_obstacle: &Coordinate) -> bool {
-    let mut visited = Grid::<Option<Direction>>::new(map.width() as usize, map.height() as usize);
+    let mut visited = Grid::<Option<Direction>>::new(map.width(), map.height());
     loop {
         if !guard.step(map, extra_obstacle) {
             // Guard walked off the map
@@ -58,7 +58,7 @@ pub fn solve(input: &PuzzleInput) -> String {
 
     // Build a list of locations that the guard has visited in an unaltered map
     let mut guard = Guard::new(guard_position, Direction::Up);
-    let mut visited_positions = HashSet::with_capacity(input.map.width() as usize * 10);
+    let mut visited_positions = HashSet::with_capacity(input.map.width() * 10);
     let fake_obstacle = Coordinate::new(-2, -2);
     while guard.step(&input.map, &fake_obstacle) {
         if guard.position != guard_position {
