@@ -1,6 +1,6 @@
 use std::{cmp::max, collections::HashSet};
 
-use aoc_grid::{grid, Grid};
+use aoc_grid::Grid;
 
 use crate::puzzle_input::{MapElement, PuzzleInput};
 

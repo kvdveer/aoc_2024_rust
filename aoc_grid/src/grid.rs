@@ -4,7 +4,6 @@
 use std::{
     fmt::{self},
     ops::{Index, IndexMut},
-    usize,
 };
 
 use crate::Coordinate;
