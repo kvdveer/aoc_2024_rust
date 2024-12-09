@@ -18,3 +18,12 @@ This time, I could not find a way to do this without a big memory allocation. I 
 | part1       | 205.08 µs | 207.57 µs | 210.02 µs |
 | part2       | 146.08 ms | 146.81 ms | 147.60 ms |
 | complete    | 152.78 ms | 154.19 ms | 155.67 ms |
+
+We can avoid the huge allocation if we work with freelists. This gives us a 21% performance boost:
+
+| Name        | Best | Average | Worst |
+|-------------|------|---------|-------|
+| part2 | 123.07 ms | 124.59 ms | 126.17 ms |
+| complete | 119.69 ms | 120.75 ms | 121.88 ms |
+
+I feel this could be optimized further by splitting and merging freelists, but that requires btree cursors, which are a rust nightly feature.

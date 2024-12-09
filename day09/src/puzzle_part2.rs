@@ -1,9 +1,49 @@
+use std::{collections::BTreeMap, ops::Range};
+
 use crate::puzzle_input::PuzzleInput;
 
 struct PlacedFile {
     index: u64,
     start: u64,
     len: u8,
+}
+
+struct UsedMap {
+    used: BTreeMap<u64, Range<u64>>,
+}
+
+impl UsedMap {
+    fn new(_size: u64) -> UsedMap {
+        UsedMap {
+            used: BTreeMap::new(),
+        }
+    }
+
+    fn mark(&mut self, area: Range<u64>, value: bool) {
+        if value {
+            self.used.insert(area.start, area);
+        } else {
+            let old = self.used.remove(&area.start).unwrap();
+            assert!(old.start == area.start);
+            assert!(old.end == area.end);
+        }
+    }
+
+    fn find_free(&mut self, len: u8, max_pos: u64) -> Option<u64> {
+        let mut cursor = 0;
+        for (start, range) in self.used.iter() {
+            if *start > max_pos {
+                return None;
+            }
+
+            if range.start - cursor >= len as u64 {
+                return Some(cursor);
+            }
+
+            cursor = range.end;
+        }
+        return None;
+    }
 }
 
 pub fn solve(input: &PuzzleInput) -> String {
@@ -22,52 +62,24 @@ pub fn solve(input: &PuzzleInput) -> String {
         })
         .collect::<Vec<_>>();
 
-    let mut free_list = input
-        .files
-        .iter()
-        .flat_map(|f| {
-            (0..f.size)
-                .map(|_| false)
-                .chain((0..f.space_after).map(|_| true))
-        })
-        .collect::<Vec<_>>();
+    let last_file = files.last().unwrap();
+    let disk_size = last_file.start + last_file.len as u64;
+
+    let mut free_map = UsedMap::new(disk_size);
+    files.iter().for_each(|file| {
+        free_map.mark(file.start..(file.start + file.len as u64), true);
+    });
 
     files.iter_mut().rev().for_each(|file| {
-        cursor = 0;
-        let mut free_count = 0;
-        let mut free_start = 0;
-        let mut free_spot: Option<u64> = None;
-
-        for (i, is_free) in free_list.iter().enumerate() {
-            if (i as u64) > file.start {
-                // Only move files to the left.
-                break;
-            }
-            if !is_free {
-                free_count = 0;
-                free_start = i + 1;
-            } else {
-                free_count += 1;
-                if free_count == file.len as u64 {
-                    free_spot = Some(free_start as u64);
-                    break;
-                }
-            }
-        }
-
-        if let Some(spot) = free_spot {
+        if let Some(spot) = free_map.find_free(file.len, file.start) {
             // Mark the previous location of the file as free
-            free_list[(file.start as usize)..(file.start + file.len as u64) as usize]
-                .iter_mut()
-                .for_each(|f| *f = true);
+            free_map.mark(file.start..(file.start + file.len as u64), false);
 
             // Move the file to the free space.
             file.start = spot;
 
             // Mark the free space as used.
-            free_list[(file.start as usize)..(file.start + file.len as u64) as usize]
-                .iter_mut()
-                .for_each(|f| *f = false);
+            free_map.mark(file.start..(file.start + file.len as u64), true);
         }
     });
 
