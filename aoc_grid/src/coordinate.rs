@@ -3,9 +3,11 @@
 //! This module provides a simple 2D coordinate type that can be used to represent points on a
 //! grid. It is intended to be used in conjunction with the `Grid` type, which provides a 2D grid
 //! data structure.
+
+use std::fmt::Debug;
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Eq, Hash, PartialEq)]
 pub struct Coordinate(pub isize, pub isize);
 
 impl Coordinate {
@@ -16,6 +18,12 @@ impl Coordinate {
 
     pub const fn manhattan_distance(self, other: Self) -> usize {
         ((self.0 - other.0).abs() + (self.1 - other.1).abs()) as usize
+    }
+}
+
+impl Debug for Coordinate {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {})", self.0, self.1)
     }
 }
 

@@ -1,0 +1,21 @@
+[package]
+name = "day10"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aoc_grid = { path = "../aoc_grid" }
+nom = { workspace = true }
+
+[dev-dependencies]
+divan = { workspace = true }
+criterion = { workspace = true }
+rstest = { workspace = true }
+
+[[bench]]
+name = "criterion"
+harness = false
+
+[[bench]]
+name = "divan"
+harness = false
