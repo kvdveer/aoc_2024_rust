@@ -17,7 +17,8 @@ Even with this insight, performance was not good enough. Fortunately, many of th
 | ---- | ---- | ---- | ------ |
 | parse | 303.06 ns | 317.22 ns | 332.93 ns |
 | part1 | 20.948 ms | 22.052 ms | 23.218 ms |
+| part1 (optimized) | 636.95 ns | 676.94 ns | 716.51 ns |
 | part2 | 670.41 ns | 743.18 ns | 828.40 ns |
-| complete | 13.996 ms | 14.686 ms | 15.456 ms |
+| complete | 1.4012 µs | 1.4466 µs | 1.5007 µs |
 
 Part 1 dominates these test results, but fortunately we can just transplant the part 2 soution to part 1 and get a near-100% speedup.

@@ -1,54 +1,35 @@
 use crate::puzzle_input::PuzzleInput;
 
-struct ExpansionIterator<'t> {
-    source: &'t mut dyn Iterator<Item = &'t u128>,
-    to_yield: Option<u128>,
-}
+use memoize::memoize;
 
-impl<'t> ExpansionIterator<'t> {
-    fn new(source: &'t mut dyn Iterator<Item = &'t u128>) -> Self {
-        Self {
-            source,
-            to_yield: None,
-        }
+#[memoize]
+fn count_expansion(input: u128, expansions: usize) -> u128 {
+    if expansions == 0 {
+        return 1;
     }
-}
 
-impl Iterator for ExpansionIterator<'_> {
-    type Item = u128;
+    if input == 0 {
+        return count_expansion(1, expansions - 1);
+    }
 
-    fn next(&mut self) -> Option<Self::Item> {
-        if let Some(yielded) = self.to_yield.take() {
-            return Some(yielded);
-        }
-
-        let next = self.source.next()?;
-        if *next == 0 {
-            return Some(1);
-        }
-
-        let digits = next.ilog10() + 1;
-
-        if digits % 2 == 0 {
-            // Even number of digits, split the number in half
-            let splitting_power = 10u128.pow(digits / 2);
-            self.to_yield = Some(next % splitting_power);
-
-            Some(next / splitting_power)
-        } else {
-            Some(next * 2024)
-        }
+    let digits = input.ilog10() + 1;
+    if digits % 2 == 0 {
+        let splitting_power = 10u128.pow(digits / 2);
+        let remainder = input % splitting_power;
+        let quotient = input / splitting_power;
+        count_expansion(remainder, expansions - 1) + count_expansion(quotient, expansions - 1)
+    } else {
+        count_expansion(input * 2024, expansions - 1)
     }
 }
 
 pub fn solve(input: &PuzzleInput) -> String {
-    let mut finger = input.numbers.clone();
-
-    for _ in 0..25 {
-        finger = ExpansionIterator::new(&mut finger.iter()).collect();
-    }
-
-    finger.len().to_string()
+    input
+        .numbers
+        .iter()
+        .map(|number| count_expansion(*number, 25))
+        .sum::<u128>()
+        .to_string()
 }
 
 #[cfg(test)]
