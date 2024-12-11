@@ -1,0 +1,21 @@
+[package]
+name = "day11"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+memoize = "0.4.2"
+nom = { workspace = true }
+
+[dev-dependencies]
+divan = { workspace = true }
+criterion = { workspace = true }
+rstest = { workspace = true }
+
+[[bench]]
+name = "criterion"
+harness = false
+
+[[bench]]
+name = "divan"
+harness = false
