@@ -4,8 +4,8 @@ use aoc_grid::{Coordinate, Direction, Grid};
 
 pub struct GridFillFollower<'a, T, P> {
     grid: &'a Grid<T>,
-    todo: VecDeque<Coordinate>,
-    visited: HashSet<Coordinate>,
+    todo: Vec<Coordinate>,
+    visited: Grid<bool>,
     predicate: P,
 }
 
@@ -20,13 +20,13 @@ impl<'a, T> FollowArea<'a, T> for Grid<T> {
     where
         P: FnMut(&T) -> bool,
     {
-        let mut todo = VecDeque::new();
-        todo.push_back(*start);
+        let mut todo = Vec::with_capacity(self.width());
+        todo.push(*start);
 
         GridFillFollower {
             grid: self,
             todo,
-            visited: HashSet::new(),
+            visited: Grid::new(self.width(), self.height()),
             predicate,
         }
     }
@@ -40,19 +40,20 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
-            let current = self.todo.pop_front()?;
+            let current = self.todo.pop()?;
 
-            if !self.visited.insert(current) {
+            if self.visited[current] {
                 // Coordinate already visited
                 continue;
             }
+            self.visited[current] = true;
 
             for direction in Direction::CARDINAL_4 {
                 let neighbor = current + &direction;
                 if self.grid.contains(neighbor) {
                     let neighbor_value = &self.grid[&neighbor];
                     if (self.predicate)(neighbor_value) {
-                        self.todo.push_back(neighbor);
+                        self.todo.push(neighbor);
                     }
                 }
             }
