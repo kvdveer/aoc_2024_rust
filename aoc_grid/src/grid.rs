@@ -6,6 +6,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
+use crate::grid_index::GridIndex;
 use crate::Coordinate;
 
 #[derive(PartialEq, Clone, Hash, Eq)]
@@ -16,7 +17,6 @@ pub struct Grid<T> {
 
 impl<T> Grid<T> {
     // Creates a new Grid with the given width and height, with each cell initialized to the default value of T.
-    #[must_use]
     pub fn new(width: usize, height: usize) -> Self
     where
         T: Default + Clone,
@@ -30,7 +30,6 @@ impl<T> Grid<T> {
 
     // Creates a new Grid with the given width and height, with each cell initialized to the given value.
     // The provided iterator must yield exactly width * height elements, and be in row-major order.
-    #[must_use]
     pub fn new_from_iter<InputItem: Into<T>>(
         width: usize,
         height: usize,
@@ -45,39 +44,34 @@ impl<T> Grid<T> {
     }
 
     // Height of the grid
-    #[must_use]
     pub fn height(&self) -> usize {
         self.cells.len() / self.stride
     }
 
     // Width of the grid
-    #[must_use]
     pub const fn width(&self) -> usize {
         self.stride
     }
 
     // Wraps a coordinate to be inside the grid boundaries.
-    #[must_use]
-    pub fn wrap<U: Into<(isize, isize)>>(&self, pos: U) -> Coordinate {
+    pub fn wrap<U: GridIndex>(&self, pos: U) -> Coordinate {
         let w = self.width() as isize;
         let h = self.height() as isize;
 
-        let pos: (isize, isize) = pos.into();
-        let mut x = pos.0 % w;
-        let mut y = pos.1 % h;
-        if x < 0 {
-            x += w;
-        }
-        if y < 0 {
-            y += h
-        }
+        let x = pos.x().rem_euclid(w);
+        let y = pos.y().rem_euclid(h);
         Coordinate::new(x, y)
     }
 
     // Linearizes a 2D coordinate into a 1D index, used for the underlying array.
-    fn offset<U: Into<(isize, isize)>>(&self, pos: U) -> usize {
-        let pos: (isize, isize) = pos.into();
-        (pos.1 * self.stride as isize + pos.0) as usize
+    fn offset<U: GridIndex>(&self, pos: U) -> Option<usize> {
+        let x = pos.x();
+        let y = pos.y();
+        if x >= 0 && x < self.width() as isize && y >= 0 && y < self.height() as isize {
+            Some((y * self.stride as isize + x) as usize)
+        } else {
+            None
+        }
     }
 
     // Returns a new grid with the same dimensions as self, but with each cell mapped to a new value.
@@ -104,24 +98,14 @@ impl<T> Grid<T> {
     }
 
     // Retrieves a value from the grid, if the provided position is within the grid boundaries.
-    pub fn get<U: Into<(isize, isize)>>(&self, pos: U) -> Option<&T> {
-        let pos: (isize, isize) = pos.into();
-        if self.coordinate_valid(pos) {
-            Some(&self.cells[self.offset(pos)])
-        } else {
-            None
-        }
+    pub fn get<U: GridIndex + Clone>(&self, pos: U) -> Option<&T> {
+        Some(&self.cells[self.offset(pos)?])
     }
 
     // Retrieves a mutable value from the grid, if the provided position is within the grid boundaries.
-    pub fn get_mut<U: Into<(isize, isize)>>(&mut self, pos: U) -> Option<&mut T> {
-        let pos: (isize, isize) = pos.into();
-        if self.coordinate_valid(pos) {
-            let offset = self.offset(pos);
-            Some(&mut self.cells[offset])
-        } else {
-            None
-        }
+    pub fn get_mut<U: GridIndex + Clone>(&mut self, pos: U) -> Option<&mut T> {
+        let offset = self.offset(pos)?;
+        Some(&mut self.cells[offset])
     }
 
     // Iterates over the entries of the grid.
@@ -141,19 +125,17 @@ impl<T> Grid<T> {
         })
     }
 
-    pub fn coordinate_valid<U: Into<(isize, isize)>>(&self, pos: U) -> bool {
-        let pos: (isize, isize) = pos.into();
-        pos.0 >= 0
-            && (pos.0 < self.width() as isize)
-            && pos.1 >= 0
-            && pos.1 < (self.height() as isize)
+    pub fn contains<U: GridIndex>(&self, pos: U) -> bool {
+        let x = pos.x();
+        let y = pos.y();
+        x >= 0 && (x < self.width() as isize) && y >= 0 && y < (self.height() as isize)
     }
 }
 
 // Indexing into the grid. This requires the grid position to be valid
 impl<T, U> Index<U> for Grid<T>
 where
-    U: Into<(isize, isize)>,
+    U: GridIndex + Clone,
 {
     type Output = T;
 
@@ -165,7 +147,7 @@ where
 // Mutable indexing into the grid. This requires the grid position to be valid
 impl<T, U> IndexMut<U> for Grid<T>
 where
-    U: Into<(isize, isize)>,
+    U: GridIndex + Clone,
 {
     fn index_mut(&mut self, position: U) -> &mut Self::Output {
         self.get_mut(position).expect("Index outside grid")
@@ -177,7 +159,6 @@ where
     T: Clone,
 {
     // Returns a new grid with the same dimensions as self, with the rows and columns swapped.
-    #[must_use]
     pub fn transpose(&self) -> Self {
         let new_stride = self.height();
         let mut cells = Vec::<T>::with_capacity(self.cells.len());
@@ -233,7 +214,7 @@ where
         writeln!(f)?;
         for y in 0..self.height() {
             for x in 0..self.width() {
-                let cell = &self.cells[self.offset((x as isize, y as isize))];
+                let cell = &self.cells[self.offset((x, y)).unwrap()];
                 let c: char = char::from(*cell);
                 write!(f, "{c}")?;
             }
@@ -327,17 +308,17 @@ mod tests {
     }
 
     #[test]
-    fn test_grid_coordinate_valid() {
+    fn test_grid_contains() {
         let grid = Grid::from(vec![
             vec!['a', 'b', 'c'],
             vec!['d', 'e', 'f'],
             vec!['g', 'h', 'i'],
         ]);
-        assert!(grid.coordinate_valid((0, 0)));
-        assert!(!grid.coordinate_valid((-1, 0)));
-        assert!(!grid.coordinate_valid((3, 0)));
-        assert!(!grid.coordinate_valid((0, -1)));
-        assert!(!grid.coordinate_valid((0, 3)));
+        assert!(grid.contains((0, 0)));
+        assert!(!grid.contains((-1, 0)));
+        assert!(!grid.contains((3, 0)));
+        assert!(!grid.contains((0, -1)));
+        assert!(!grid.contains((0, 3)));
     }
 
     #[test]

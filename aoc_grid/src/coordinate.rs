@@ -27,12 +27,6 @@ impl Debug for Coordinate {
     }
 }
 
-impl From<(isize, isize)> for Coordinate {
-    fn from((x, y): (isize, isize)) -> Self {
-        Self(x, y)
-    }
-}
-
 impl From<&(isize, isize)> for Coordinate {
     fn from(&(x, y): &(isize, isize)) -> Self {
         Self(x, y)

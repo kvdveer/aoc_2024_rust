@@ -42,7 +42,7 @@ impl UsedMap {
 
             cursor = range.end;
         }
-        return None;
+        None
     }
 }
 

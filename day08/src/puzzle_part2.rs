@@ -47,7 +47,7 @@ pub fn solve(input: &PuzzleInput) -> String {
 
                 (-max_repetitions..=max_repetitions).for_each(|n| {
                     let antinode = a + delta * n;
-                    if antinodes.coordinate_valid(antinode) {
+                    if antinodes.contains(antinode) {
                         antinodes[antinode] = true;
                     }
                 });

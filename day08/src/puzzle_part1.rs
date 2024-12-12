@@ -43,10 +43,10 @@ pub fn solve(input: &PuzzleInput) -> String {
                 let antinode1 = a + delta;
                 let antinode2 = b - delta;
 
-                if antinodes.coordinate_valid(antinode1) {
+                if antinodes.contains(antinode1) {
                     antinodes[antinode1] = true;
                 }
-                if antinodes.coordinate_valid(antinode2) {
+                if antinodes.contains(antinode2) {
                     antinodes[antinode2] = true;
                 }
             });
