@@ -1,5 +1,3 @@
-use std::collections::{HashSet, VecDeque};
-
 use aoc_grid::{Coordinate, Direction, Grid};
 
 pub struct GridFillFollower<'a, T, P> {
