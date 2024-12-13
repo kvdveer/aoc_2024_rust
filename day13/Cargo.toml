@@ -1,0 +1,16 @@
+[package]
+name = "day13"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+indicatif = "0.17.9"
+nom = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+rstest = { workspace = true }
+
+[[bench]]
+name = "criterion"
+harness = false
