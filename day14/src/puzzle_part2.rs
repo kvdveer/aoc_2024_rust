@@ -1,3 +1,5 @@
+use std::vec;
+
 use crate::puzzle_input::{PuzzleInput, Robot};
 use aoc_grid::Grid;
 
@@ -12,27 +14,24 @@ impl RobotSimulator for Robot {
     }
 }
 
-fn tree_likelyhood(robots: &mut impl Iterator<Item = (i64, i64)>, grid_size: (i64, i64)) -> usize {
-    let mut grid = Grid::<bool>::new(grid_size.0 as usize, grid_size.1 as usize);
-    // Assumption: when there's a tree, there are several adjacent non-empty cells
+fn contains_ascii_art(
+    robots: &mut impl Iterator<Item = (i64, i64)>,
+    grid_size: (i64, i64),
+) -> bool {
+    let mut robot_count = 0;
 
-    robots
-        .filter(|pos| {
-            if let Some(c) = grid.get_mut((pos.0 + 1, pos.1)) {
-                *c = true;
-            }
-            if let Some(c) = grid.get_mut((pos.0 - 1, pos.1)) {
-                *c = true;
-            }
-            if let Some(c) = grid.get_mut((pos.0, pos.1 + 1)) {
-                *c = true;
-            }
-            if let Some(c) = grid.get_mut((pos.0, pos.1 - 1)) {
-                *c = true;
-            }
-            grid[pos]
-        })
-        .count()
+    let tally = robots.fold(
+        (vec![0; grid_size.0 as usize], vec![0; grid_size.1 as usize]),
+        |mut tally, (x, y)| {
+            robot_count += 1;
+            tally.0[x as usize] += 1;
+            tally.1[y as usize] += 1;
+            tally
+        },
+    );
+
+    tally.0.iter().any(|&v| v > 5 * robot_count / grid_size.0)
+        && tally.1.iter().any(|&v| v > 5 * robot_count / grid_size.1)
 }
 
 pub fn solve(input: &PuzzleInput) -> String {
@@ -59,14 +58,13 @@ pub fn solve(input: &PuzzleInput) -> String {
     }
 
     let mut robots = input.robots.clone();
-    for i in 0.. {
+    for i in 0..10000 {
         let mut robot_locations = robots.iter_mut().map(|robot| {
             robot.simulate_step(1, grid_size);
             robot.position
         });
 
-        let l = tree_likelyhood(&mut robot_locations, grid_size);
-        if l > 150 {
+        if contains_ascii_art(&mut robot_locations, grid_size) {
             return (i + 1).to_string();
         }
     }

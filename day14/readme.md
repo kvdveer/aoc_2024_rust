@@ -35,3 +35,12 @@ Part 2 is quite slow, as I allocate a grid each time. My initial implementation 
 | part1      | 2.8981 µs | 2.9457 µs | 2.9943 µs |
 | part2      | 58.462 ms | 59.516 ms | 60.600 ms |
 | complete   | 60.739 ms | 61.470 ms | 62.227 ms |
+
+Still, my tree-detection is quite slow. Another method I could use is entropy analysis. Tallying op the x and y coordinates, should yield a rougly equally distributed set of coordinates. The tree would be the only exception, as it would have a high entropy. Implementing this again yielded a satisfying performance boost of 30%.
+
+| name | best | average | worst |
+| --- | ---:| ---:| ---:|
+| parse |   46.047 µs |  46.980 µs | 48.050 µs |
+| part1 |   2.7849 µs |  2.7999 µs | 2.8158 µs |
+| part2 |   36.474 ms |  37.121 ms | 37.806 ms |
+| complete |34.602 ms |  34.802 ms | 35.009 ms |
