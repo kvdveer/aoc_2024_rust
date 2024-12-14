@@ -27,4 +27,11 @@ The solution was accepted, and I got a nice ascii art of a christmass tree.
 | part2      | 242.19 ms | 248.65 ms | 255.37 ms |
 | complete   | 263.99 ms | 273.42 ms | 283.15 ms |
 
-Part 2 is quite slow, as I allocate a grid each time.
+Part 2 is quite slow, as I allocate a grid each time. My initial implementation checked each grid cell. I managed to optimize this by only checking where the robots were. This yielded a satisfying 73% performance boost.
+
+| name | best | average | worst |
+| --- | ---:| ---:| ---:|
+| parse      | 33.385 µs | 34.575 µs | 35.758 µs |
+| part1      | 2.8981 µs | 2.9457 µs | 2.9943 µs |
+| part2      | 58.462 ms | 59.516 ms | 60.600 ms |
+| complete   | 60.739 ms | 61.470 ms | 62.227 ms |

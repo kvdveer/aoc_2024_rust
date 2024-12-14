@@ -78,7 +78,7 @@ mod tests {
 
     #[rstest]
     #[case::example_input(include_str!("../example_input.txt"), "12")]
-    #[case::final_input( include_str!("../input.txt"), ">500,<242932500")]
+    #[case::final_input( include_str!("../input.txt"), "229868730")]
     fn test_solve(#[case] input: &str, #[case] expected: &str) {
         let input = PuzzleInput::try_from(input).unwrap();
         assert_eq!(solve(&input), expected);

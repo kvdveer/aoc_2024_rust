@@ -12,15 +12,25 @@ impl RobotSimulator for Robot {
     }
 }
 
-fn tree_likelyhood(grid: &Grid<i32>) -> usize {
+fn tree_likelyhood(robots: &mut impl Iterator<Item = (i64, i64)>, grid_size: (i64, i64)) -> usize {
+    let mut grid = Grid::<bool>::new(grid_size.0 as usize, grid_size.1 as usize);
     // Assumption: when there's a tree, there are several adjacent non-empty cells
-    grid.iter_pairs()
-        .filter_map(|(c, v)| if *v > 0 { Some(c) } else { None })
-        .filter(|c| {
-            *grid.get((c.0 + 1, c.1)).unwrap_or(&0) != 0
-                || *grid.get((c.0 - 1, c.1)).unwrap_or(&0) != 0
-                || *grid.get((c.0, c.1 + 1)).unwrap_or(&0) != 0
-                || *grid.get((c.0, c.1 - 1)).unwrap_or(&0) != 0
+
+    robots
+        .filter(|pos| {
+            if let Some(c) = grid.get_mut((pos.0 + 1, pos.1)) {
+                *c = true;
+            }
+            if let Some(c) = grid.get_mut((pos.0 - 1, pos.1)) {
+                *c = true;
+            }
+            if let Some(c) = grid.get_mut((pos.0, pos.1 + 1)) {
+                *c = true;
+            }
+            if let Some(c) = grid.get_mut((pos.0, pos.1 - 1)) {
+                *c = true;
+            }
+            grid[pos]
         })
         .count()
 }
@@ -45,29 +55,22 @@ pub fn solve(input: &PuzzleInput) -> String {
 
     if grid_size.0 < 50 {
         // I don't think the example has a solution
-        return "UNSOLVED".to_string();
+        return "UNSOLVABLE".to_string();
     }
 
     let mut robots = input.robots.clone();
     for i in 0.. {
-        let mut computed_location_grid =
-            Grid::<i32>::new(grid_size.0 as usize, grid_size.1 as usize);
-        robots
-            .iter_mut()
-            .map(|robot| {
-                robot.simulate_step(1, grid_size);
-                robot.position
-            })
-            .for_each(|pos| {
-                computed_location_grid[pos] += 1;
-            });
+        let mut robot_locations = robots.iter_mut().map(|robot| {
+            robot.simulate_step(1, grid_size);
+            robot.position
+        });
 
-        let l = tree_likelyhood(&computed_location_grid);
-        if l > 300 {
+        let l = tree_likelyhood(&mut robot_locations, grid_size);
+        if l > 150 {
             return (i + 1).to_string();
         }
     }
-    "UNSOLVED".to_string()
+    unreachable!()
 }
 
 #[cfg(test)]
@@ -77,8 +80,8 @@ mod tests {
     use super::*;
 
     #[rstest]
-    #[case::example_input(include_str!("../example_input.txt"), "12")]
-    #[case::final_input( include_str!("../input.txt"), ">500,<242932500")]
+    #[case::example_input(include_str!("../example_input.txt"), "UNSOLVABLE")]
+    #[case::final_input( include_str!("../input.txt"), "7861")]
     fn test_solve(#[case] input: &str, #[case] expected: &str) {
         let input = PuzzleInput::try_from(input).unwrap();
         assert_eq!(solve(&input), expected);
