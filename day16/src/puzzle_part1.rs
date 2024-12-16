@@ -10,7 +10,21 @@ struct RacerState {
 
 impl RacerState {
     fn successors(&self, map: &Grid<MapState>) -> Vec<(RacerState, u32)> {
-        let mut result = Vec::new();
+        let mut result = Vec::with_capacity(4);
+
+        // Add rotations with a fee of 1000000
+        result.extend((1..=3).map(|r| {
+            (
+                RacerState {
+                    pos: self.pos,
+                    direction: self.direction.rotate_clockwise_4(r),
+                },
+                1_000,
+            )
+        }));
+
+        // If the next tile add it with a fee of 1000, or 1001 if it's already visited (to prevent revisits)
+
         if map.get(self.pos + &self.direction) == Some(&MapState::Empty) {
             result.push((
                 RacerState {
@@ -20,28 +34,6 @@ impl RacerState {
                 1,
             ));
         }
-
-        result.push((
-            RacerState {
-                pos: self.pos,
-                direction: self.direction.rotate_clockwise_4(1),
-            },
-            1000,
-        ));
-        result.push((
-            RacerState {
-                pos: self.pos,
-                direction: self.direction.rotate_clockwise_4(2),
-            },
-            1000,
-        ));
-        result.push((
-            RacerState {
-                pos: self.pos,
-                direction: self.direction.rotate_clockwise_4(3),
-            },
-            1000,
-        ));
 
         result
     }

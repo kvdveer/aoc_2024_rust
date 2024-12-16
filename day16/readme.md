@@ -18,3 +18,10 @@ I implemented this by calculating a fee for visiting a node again, and then retr
 | part1 |      5.0180 ms | 5.0349 ms | 5.0525 ms |
 | part2 |      16.445 ms | 17.016 ms | 17.617 ms |
 | complete |   22.019 ms | 22.306 ms | 22.604 ms |
+
+After reviewing the code, I noticed that `pathfinding` has the `astar_bag` method, which solves this exact problem. This gave me a satifying ~50% performance gain, as well as a significant reduction in code complexity.
+
+| name | best | average | worst |
+| --- | ---:| ---:| ---:|
+| part2      | 8.5179 ms | 8.5817 ms | 8.6574 ms |
+| complete   | 11.851 ms | 11.894 ms | 11.942 ms |

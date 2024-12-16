@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use aoc_grid::{Coordinate, Direction, Grid};
-use pathfinding::prelude::astar;
+use pathfinding::prelude::{astar, astar_bag_collect};
 
 use crate::puzzle::{MapState, PuzzleInput};
 
@@ -12,11 +12,7 @@ struct RacerState {
 }
 
 impl RacerState {
-    fn successors(
-        &self,
-        map: &Grid<MapState>,
-        visited: &HashSet<Coordinate>,
-    ) -> Vec<(RacerState, u32)> {
+    fn successors(&self, map: &Grid<MapState>) -> Vec<(RacerState, u32)> {
         let mut result = Vec::with_capacity(4);
 
         // Add rotations with a fee of 1000000
@@ -26,24 +22,19 @@ impl RacerState {
                     pos: self.pos,
                     direction: self.direction.rotate_clockwise_4(r),
                 },
-                1_000_000,
+                1_000,
             )
         }));
 
         // If the next tile add it with a fee of 1000, or 1001 if it's already visited (to prevent revisits)
 
         if map.get(self.pos + &self.direction) == Some(&MapState::Empty) {
-            let visited_fee = if visited.contains(&(self.pos + &self.direction)) {
-                1
-            } else {
-                0
-            };
             result.push((
                 RacerState {
                     pos: self.pos + &self.direction,
                     direction: self.direction,
                 },
-                1000 + visited_fee,
+                1,
             ));
         }
 
@@ -57,42 +48,20 @@ pub trait Part2 {
 
 impl Part2 for PuzzleInput {
     fn part2(&self) -> String {
-        let mut visited = HashSet::new();
-
-        let (path, _) = astar(
+        let (paths, _) = astar_bag_collect(
             &RacerState {
                 pos: self.start,
                 direction: Direction::Right,
             },
-            |p| p.successors(&self.map, &visited),
+            |p| p.successors(&self.map),
             |p| p.pos.manhattan_distance(self.finish) as u32,
             |p| p.pos == self.finish,
         )
         .expect("There's always a path");
 
-        path.iter().for_each(|p| {
-            visited.insert(p.pos);
-        });
-
-        loop {
-            let (path, _) = astar(
-                &RacerState {
-                    pos: self.start,
-                    direction: Direction::Right,
-                },
-                |p| p.successors(&self.map, &visited),
-                |p| p.pos.manhattan_distance(self.finish) as u32,
-                |p| p.pos == self.finish,
-            )
-            .expect("There's always a path");
-
-            let num_new = path.iter().filter(|p| visited.insert(p.pos)).count();
-            if num_new == 0 {
-                break;
-            }
-        }
-
-        visited.len().to_string()
+        HashSet::<Coordinate>::from_iter(paths.iter().flat_map(|path| path.iter().map(|p| p.pos)))
+            .len()
+            .to_string()
     }
 }
 
