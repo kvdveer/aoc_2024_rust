@@ -130,6 +130,13 @@ impl<T> Grid<T> {
         let y = pos.y();
         x >= 0 && (x < self.width() as isize) && y >= 0 && y < (self.height() as isize)
     }
+
+    pub fn fill(&mut self, value: T)
+    where
+        T: Clone,
+    {
+        self.cells.fill(value);
+    }
 }
 
 // Indexing into the grid. This requires the grid position to be valid
@@ -211,7 +218,6 @@ where
 {
     // If the cells can be converted to characters, display the grid as a 2D array of characters.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f)?;
         for y in 0..self.height() {
             for x in 0..self.width() {
                 let cell = &self.cells[self.offset((x, y)).unwrap()];

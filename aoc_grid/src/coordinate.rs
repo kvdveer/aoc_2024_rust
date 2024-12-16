@@ -7,7 +7,9 @@
 use std::fmt::Debug;
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-#[derive(Clone, Copy, Eq, Hash, PartialEq)]
+use crate::grid_index::GridIndex;
+
+#[derive(Clone, Copy, Eq, Hash)]
 pub struct Coordinate(pub isize, pub isize);
 
 impl Coordinate {
@@ -42,6 +44,15 @@ impl From<Coordinate> for (isize, isize) {
 impl From<&Coordinate> for (isize, isize) {
     fn from(coord: &Coordinate) -> Self {
         (coord.0, coord.1)
+    }
+}
+
+impl<T> PartialEq<T> for Coordinate
+where
+    T: GridIndex,
+{
+    fn eq(&self, other: &T) -> bool {
+        self.0 == other.x() && self.1 == other.y()
     }
 }
 
