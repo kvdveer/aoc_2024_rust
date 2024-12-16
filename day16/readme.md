@@ -1,0 +1,20 @@
+# Advent of Code day 16
+
+## Part 1
+
+It was about time we got some pathfinding question. I delegated most of the work to the excelent `pathfinding` crate.
+The only non-standard thing was computing the price for rotation, but the `pathfinding` crate makes that easy as well.
+
+## Part 2
+
+Finding the shortest path is standard, but finding all shortest paths usually is not.
+I implemented this by calculating a fee for visiting a node again, and then retrying pathfinding until no more new nodes are found.
+
+## Performance
+
+| name | best | average | worst |
+| --- | ---:| ---:| ---:|
+| parse |      213.95 µs | 215.24 µs | 216.72 µs |
+| part1 |      5.0180 ms | 5.0349 ms | 5.0525 ms |
+| part2 |      16.445 ms | 17.016 ms | 17.617 ms |
+| complete |   22.019 ms | 22.306 ms | 22.604 ms |
