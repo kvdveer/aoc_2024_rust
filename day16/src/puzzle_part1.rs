@@ -1,6 +1,6 @@
 use crate::puzzle::{MapState, PuzzleInput};
 use aoc_grid::{Coordinate, Direction, Grid};
-use pathfinding::prelude::astar;
+use pathfinding::prelude::dijkstra;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 struct RacerState {
@@ -45,13 +45,12 @@ pub trait Part1 {
 
 impl Part1 for PuzzleInput {
     fn part1(&self) -> String {
-        let result = astar(
+        let result = dijkstra(
             &RacerState {
                 pos: self.start,
                 direction: Direction::Right,
             },
             |p| p.successors(&self.map),
-            |p| p.pos.manhattan_distance(self.finish) as u32,
             |p| p.pos == self.finish,
         );
 

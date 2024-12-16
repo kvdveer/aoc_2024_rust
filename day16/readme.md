@@ -25,3 +25,10 @@ After reviewing the code, I noticed that `pathfinding` has the `astar_bag` metho
 | --- | ---:| ---:| ---:|
 | part2      | 8.5179 ms | 8.5817 ms | 8.6574 ms |
 | complete   | 11.851 ms | 11.894 ms | 11.942 ms |
+
+It occurred to me that part 1 could be further optimized using the Dijkstra algorithm, as only a single path is needed. This gave a 40% performance gain. Unfortunately, the second part can't use Dijkstra as it needs to find all shortest paths, which Dijkstra optimizes away.
+
+| name | best | average | worst |
+| --- | ---:| ---:| ---:|
+| part1 |     2.9723 ms | 2.9853 ms | 2.9999 ms |
+| complete |  11.135 ms | 11.321 ms | 11.530 ms |
