@@ -3,7 +3,6 @@ use std::cmp::min;
 use aoc_grid::Grid;
 use nom::{
     self,
-    bytes::complete::tag,
     character::complete::{multispace0, newline, one_of},
     combinator::map,
     error::Error,

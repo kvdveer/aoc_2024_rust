@@ -283,24 +283,24 @@ mod tests {
 
     #[test]
     fn test_direction_cast() {
-        assert_eq!(Coordinate(0, -1), Direction::Up.into());
-        assert_eq!(Coordinate(0, 1), Direction::Down.into());
-        assert_eq!(Coordinate(-1, 0), Direction::Left.into());
-        assert_eq!(Coordinate(1, 0), Direction::Right.into());
+        assert_eq!(Coordinate(0, -1), Coordinate::from(Direction::Up));
+        assert_eq!(Coordinate(0, 1), Coordinate::from(Direction::Down));
+        assert_eq!(Coordinate(-1, 0), Coordinate::from(Direction::Left));
+        assert_eq!(Coordinate(1, 0), Coordinate::from(Direction::Right));
 
-        assert_eq!(Coordinate(1, -1), Direction::UpRight.into());
-        assert_eq!(Coordinate(-1, -1), Direction::UpLeft.into());
-        assert_eq!(Coordinate(1, 1), Direction::DownRight.into());
-        assert_eq!(Coordinate(-1, 1), Direction::DownLeft.into());
+        assert_eq!(Coordinate(1, -1), Coordinate::from(Direction::UpRight));
+        assert_eq!(Coordinate(-1, -1), Coordinate::from(Direction::UpLeft));
+        assert_eq!(Coordinate(1, 1), Coordinate::from(Direction::DownRight));
+        assert_eq!(Coordinate(-1, 1), Coordinate::from(Direction::DownLeft));
     }
     #[test]
     fn test_rotation() {
-        // assert_eq!(Direction::Up, Direction::Left.clockwise_4());
-        // assert_eq!(Direction::UpLeft, Direction::Left.clockwise_8());
+        assert_eq!(Direction::Up, Direction::Left.clockwise_4());
+        assert_eq!(Direction::UpLeft, Direction::Left.clockwise_8());
 
-        // assert_eq!(Direction::Up, Direction::Up.rotate_clockwise_4(0));
-        // assert_eq!(Direction::Right, Direction::Up.rotate_clockwise_4(1));
-        // assert_eq!(Direction::Left, Direction::Up.rotate_clockwise_8(-2));
+        assert_eq!(Direction::Up, Direction::Up.rotate_clockwise_4(0));
+        assert_eq!(Direction::Right, Direction::Up.rotate_clockwise_4(1));
+        assert_eq!(Direction::Left, Direction::Up.rotate_clockwise_8(-2));
 
         assert_eq!(Direction::UpLeft.rotate_clockwise_4(0), Direction::UpLeft);
     }

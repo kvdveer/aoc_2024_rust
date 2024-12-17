@@ -22,7 +22,7 @@ impl Guard {
         let mut next_position = self.position + &self.direction;
         let mut next_element = map.get(next_position);
 
-        while next_element == Some(&MapElement::Obstacle) || &next_position == extra_obstacle {
+        while next_element == Some(&MapElement::Obstacle) || next_position == extra_obstacle {
             self.direction = self.direction.clockwise_4();
             next_position = self.position + &self.direction;
             next_element = map.get(next_position);

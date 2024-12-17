@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use aoc_grid::{Coordinate, Direction, Grid};
-use pathfinding::prelude::{astar, astar_bag_collect};
+use pathfinding::prelude::astar_bag_collect;
 
 use crate::puzzle::{MapState, PuzzleInput};
 

@@ -1,5 +1,4 @@
 use aoc_grid::{Coordinate, Grid};
-use nom::Finish;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub enum MapState {

@@ -217,8 +217,9 @@ impl Display for PuzzleInput {
     }
 }
 
-mod test {
-    use crate::puzzle::PuzzleInput;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
     #[test]
     fn test_simulate_one_step_free() {

@@ -1,7 +1,6 @@
 use std::vec;
 
 use crate::puzzle_input::{PuzzleInput, Robot};
-use aoc_grid::Grid;
 
 trait RobotSimulator {
     fn simulate_step(&mut self, seconds: i64, grid_size: (i64, i64));
