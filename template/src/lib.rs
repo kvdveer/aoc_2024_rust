@@ -1,3 +1,4 @@
-pub mod puzzle_input;
+pub mod puzzle;
+pub mod puzzle_parse;
 pub mod puzzle_part1;
 pub mod puzzle_part2;

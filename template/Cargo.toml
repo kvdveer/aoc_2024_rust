@@ -7,14 +7,9 @@ edition = "2021"
 nom = { workspace = true }
 
 [dev-dependencies]
-divan = { workspace = true }
 criterion = { workspace = true }
 rstest = { workspace = true }
 
 [[bench]]
 name = "criterion"
-harness = false
-
-[[bench]]
-name = "divan"
 harness = false

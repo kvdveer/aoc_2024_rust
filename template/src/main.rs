@@ -1,4 +1,8 @@
-pub mod puzzle_input;
+use puzzle_part1::Part1;
+use puzzle_part2::Part2;
+
+pub mod puzzle;
+pub mod puzzle_parse;
 pub mod puzzle_part1;
 pub mod puzzle_part2;
 
@@ -6,13 +10,13 @@ fn main() {
     let puzzle_input = include_str!("../input.txt");
 
     // Solve the puzzle for each input
-    match puzzle_input::PuzzleInput::try_from(puzzle_input) {
+    match puzzle::PuzzleInput::try_from(puzzle_input) {
         Err(e) => {
             println!("Error: {e:?}");
         }
         Ok(input) => {
-            println!("{{project-name}} - part 1: {}", puzzle_part1::solve(&input));
-            println!("{{project-name}} - part 2: {}", puzzle_part2::solve(&input));
+            println!("{{project-name}} - part 1: {}", input.part1());
+            println!("{{project-name}} - part 2: {}", input.part2());
         }
     };
 }

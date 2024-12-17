@@ -1,7 +1,13 @@
-use crate::puzzle_input::PuzzleInput;
+use crate::puzzle::PuzzleInput;
 
-pub fn solve(_input: &PuzzleInput) -> String {
-    "UNSOLVED".to_string()
+pub trait Part1 {
+    fn part1(&self) -> String;
+}
+
+impl Part1 for PuzzleInput {
+    fn part1(&self) -> String {
+        "UNSOLVED".to_string()
+    }
 }
 
 #[cfg(test)]
@@ -16,6 +22,6 @@ mod tests {
     #[case::final_input( include_str!("../input.txt"), "UNSOLVED")]
     fn test_solve(#[case] input: &str, #[case] expected: &str) {
         let input = PuzzleInput::try_from(input).unwrap();
-        assert_eq!(solve(&input), expected);
+        assert_eq!(input.part1(), expected);
     }
 }
