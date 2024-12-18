@@ -51,8 +51,7 @@ mod tests {
 
     #[rstest]
     #[case::example_input(include_str!("../example_input.txt"), "22")]
-    #[ignore]
-    #[case::final_input( include_str!("../input.txt"), "UNSOLVED")]
+    #[case::final_input( include_str!("../input.txt"), "268")]
     fn test_solve(#[case] input: &str, #[case] expected: &str) {
         let input = PuzzleInput::try_from(input).unwrap();
         assert_eq!(input.part1(), expected);
